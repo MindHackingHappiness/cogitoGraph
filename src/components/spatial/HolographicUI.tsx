@@ -116,7 +116,11 @@ export const HolographicUI = ({
             </div>
             
             <div className="text-xs text-cyber-primary font-mono">
-              NODES: {dataIntensity * 20} | PARTICLES: {dataIntensity * 2000}
+              NODES: {dataIntensity * 20} | PARTICLES: {dataIntensity * 2000} | IMAGES: 3
+            </div>
+            
+            <div className="text-[10px] text-muted-foreground font-mono mt-1">
+              Use ↑↓ keys for quick intensity control
             </div>
           </div>
         </div>

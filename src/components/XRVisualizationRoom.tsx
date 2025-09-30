@@ -19,6 +19,9 @@ import { SpatialControls } from './spatial/SpatialControls';
 import { MetricsOverlay } from './spatial/MetricsOverlay';
 import { ParticleField } from './spatial/ParticleField';
 import { CyberGrid } from './spatial/CyberGrid';
+import { FloatingImagePanels } from './spatial/FloatingImagePanels';
+import { useKeyboardControls } from '@/hooks/useKeyboardControls';
+import { Toaster } from '@/components/ui/toaster';
 
 interface XRVisualizationRoomProps {
   className?: string;
@@ -30,6 +33,14 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
   const [currentScene, setCurrentScene] = useState<'cognitive' | 'neural' | 'quantum'>('cognitive');
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Keyboard controls hook
+  useKeyboardControls({
+    dataIntensity,
+    onIntensityChange: setDataIntensity,
+    currentScene,
+    onSceneChange: setCurrentScene
+  });
 
   useEffect(() => {
     // Set ultra-high pixel ratio for maximum sharpness
@@ -114,6 +125,12 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
           
           {/* Cyber Grid Floor */}
           <CyberGrid />
+          
+          {/* Floating Image Panels */}
+          <FloatingImagePanels 
+            intensity={dataIntensity}
+            scene={currentScene}
+          />
           
           {/* Main Data Visualization */}
           <DataNodes 
