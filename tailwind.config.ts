@@ -57,6 +57,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Ultra-HD Cyber Color System
+        "cyber-primary": "hsl(var(--cyber-primary))",
+        "cyber-secondary": "hsl(var(--cyber-secondary))",
+        "cyber-accent": "hsl(var(--cyber-accent))",
+        "cyber-warning": "hsl(var(--cyber-warning))",
+        "cyber-error": "hsl(var(--cyber-error))",
+        "cyber-success": "hsl(var(--cyber-success))",
+        "holo-blue": "hsl(var(--holo-blue))",
+        "holo-purple": "hsl(var(--holo-purple))",
+        "holo-pink": "hsl(var(--holo-pink))",
+        "holo-green": "hsl(var(--holo-green))",
       },
       borderRadius: {
         lg: "var(--radius)",
