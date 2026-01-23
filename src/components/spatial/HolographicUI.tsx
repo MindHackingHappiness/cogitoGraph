@@ -2,24 +2,26 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { 
-  Activity, 
-  Zap, 
-  Brain, 
-  Atom, 
-  Eye, 
+import {
+  Activity,
+  Zap,
+  Brain,
+  Atom,
+  Eye,
   Settings,
   Maximize,
   Volume2
 } from 'lucide-react';
+
+type SceneType = 'cognitive' | 'neural' | 'quantum';
 
 interface HolographicUIProps {
   isVRMode: boolean;
   onVRToggle: (enabled: boolean) => void;
   dataIntensity: number;
   onIntensityChange: (value: number) => void;
-  currentScene: 'cognitive' | 'neural' | 'quantum';
-  onSceneChange: (scene: 'cognitive' | 'neural' | 'quantum') => void;
+  currentScene: SceneType;
+  onSceneChange: (scene: SceneType) => void;
 }
 
 export const HolographicUI = ({
@@ -72,15 +74,15 @@ export const HolographicUI = ({
           <h3 className="text-cyber-primary font-mono font-bold mb-3">SCENE MODE</h3>
           <div className="flex flex-col gap-2">
             {[
-              { id: 'cognitive', icon: Brain, label: 'COGNITIVE SPACE' },
-              { id: 'neural', icon: Activity, label: 'NEURAL NETWORK' },
-              { id: 'quantum', icon: Atom, label: 'QUANTUM FIELD' }
+              { id: 'cognitive' as SceneType, icon: Brain, label: 'COGNITIVE SPACE' },
+              { id: 'neural' as SceneType, icon: Activity, label: 'NEURAL NETWORK' },
+              { id: 'quantum' as SceneType, icon: Atom, label: 'QUANTUM FIELD' }
             ].map(({ id, icon: Icon, label }) => (
               <Button
                 key={id}
                 variant={currentScene === id ? "default" : "outline"}
                 size="sm"
-                onClick={() => onSceneChange(id as any)}
+                onClick={() => onSceneChange(id)}
                 className="justify-start neon-border"
               >
                 <Icon className="w-4 h-4 mr-2" />
