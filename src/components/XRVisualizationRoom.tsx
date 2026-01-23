@@ -1,10 +1,10 @@
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useState, useRef, useEffect } from 'react';
-import { 
-  OrbitControls, 
-  Environment, 
-  Stars, 
-  Text, 
+import {
+  OrbitControls,
+  Environment,
+  Stars,
+  Text,
   Html,
   useTexture,
   Sphere,
@@ -21,17 +21,20 @@ import { ParticleField } from './spatial/ParticleField';
 import { CyberGrid } from './spatial/CyberGrid';
 import { FloatingImagePanels } from './spatial/FloatingImagePanels';
 import { useKeyboardControls } from '@/hooks/useKeyboardControls';
+import { useWebGLSupport } from '@/hooks/useWebGLSupport';
 import { Toaster } from '@/components/ui/toaster';
+import { Card } from '@/components/ui/card';
 
 interface XRVisualizationRoomProps {
   className?: string;
 }
 
 export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => {
+  const { isSupported, errorMessage } = useWebGLSupport();
   const [isVRMode, setIsVRMode] = useState(false);
   const [dataIntensity, setDataIntensity] = useState(3);
   const [currentScene, setCurrentScene] = useState<'cognitive' | 'neural' | 'quantum'>('cognitive');
-  
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Keyboard controls hook
@@ -49,6 +52,45 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
       canvasRef.current.style.imageRendering = 'crisp-edges';
     }
   }, []);
+
+  // Loading state
+  if (isSupported === null) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-background">
+        <Card className="spatial-panel neon-border p-8">
+          <div className="hologram-text text-xl animate-pulse">
+            DETECTING WebGL CAPABILITIES...
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isSupported === false) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-background">
+        <Card className="spatial-panel neon-border p-8 max-w-lg">
+          <div className="flex flex-col items-center gap-4">
+            <h1 className="hologram-text text-2xl font-bold text-cyber-error">
+              WebGL NOT SUPPORTED
+            </h1>
+            <p className="text-muted-foreground text-center">
+              {errorMessage || 'Your browser or device does not support WebGL, which is required for this 3D visualization.'}
+            </p>
+            <div className="text-sm text-muted-foreground">
+              Please try:
+              <ul className="list-disc list-inside mt-2">
+                <li>Updating your graphics drivers</li>
+                <li>Using a modern browser (Chrome, Firefox, Edge)</li>
+                <li>Enabling hardware acceleration in browser settings</li>
+              </ul>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative w-full h-screen overflow-hidden cyber-grid ${className}`}>
