@@ -19,9 +19,8 @@ export const useWebGLSupport = () => {
 
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         if (debugInfo) {
-          const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
           const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-          console.log('WebGL Renderer:', renderer);
+          console.error('WebGL Renderer:', renderer);
         }
 
         setIsSupported(true);

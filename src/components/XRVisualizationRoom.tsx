@@ -4,15 +4,8 @@ import {
   OrbitControls,
   Environment,
   Stars,
-  Text,
-  Html,
-  useTexture,
-  Sphere,
-  Box,
-  Line,
-  Trail
+  Html
 } from '@react-three/drei';
-import * as THREE from 'three';
 import { DataNodes } from './spatial/DataNodes';
 import { HolographicUI } from './spatial/HolographicUI';
 import { SpatialControls } from './spatial/SpatialControls';
@@ -23,7 +16,6 @@ import { FloatingImagePanels } from './spatial/FloatingImagePanels';
 import { StatsMonitor } from './StatsMonitor';
 import { useKeyboardControls } from '@/hooks/useKeyboardControls';
 import { useWebGLSupport } from '@/hooks/useWebGLSupport';
-import { Toaster } from '@/components/ui/toaster';
 import { Card } from '@/components/ui/card';
 
 interface XRVisualizationRoomProps {
@@ -49,7 +41,7 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
   useEffect(() => {
     // Set ultra-high pixel ratio for maximum sharpness
     if (canvasRef.current) {
-      const pixelRatio = Math.min(window.devicePixelRatio * 2, 3);
+      Math.min(window.devicePixelRatio * 2, 3);
       canvasRef.current.style.imageRendering = 'crisp-edges';
     }
   }, []);

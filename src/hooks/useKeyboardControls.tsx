@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 interface UseKeyboardControlsProps {
@@ -16,8 +16,8 @@ export const useKeyboardControls = ({
 }: UseKeyboardControlsProps) => {
   const { toast } = useToast();
 
-  // Define scenes once - DRY principle
-  const scenes = ['cognitive', 'neural', 'quantum'] as const;
+  // Define scenes once - DRY principle (memoized to prevent re-creation)
+  const scenes = useMemo(() => ['cognitive', 'neural', 'quantum'] as const, []);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -51,7 +51,7 @@ export const useKeyboardControls = ({
           }
           break;
         
-        case 'ArrowLeft':
+        case 'ArrowLeft': {
           const currentIndex = scenes.indexOf(currentScene);
           const prevScene = scenes[(currentIndex - 1 + scenes.length) % scenes.length];
           onSceneChange(prevScene);
@@ -61,10 +61,11 @@ export const useKeyboardControls = ({
             className: "bg-cyber-secondary/10 border-cyber-secondary text-cyber-secondary"
           });
           break;
-        
-        case 'ArrowRight':
-          const currentIndexRight = scenes.indexOf(currentScene);
-          const nextScene = scenes[(currentIndexRight + 1) % scenes.length];
+        }
+
+        case 'ArrowRight': {
+          const currentIndex = scenes.indexOf(currentScene);
+          const nextScene = scenes[(currentIndex + 1) % scenes.length];
           onSceneChange(nextScene);
           toast({
             title: "SCENE SWITCHED",
@@ -72,6 +73,7 @@ export const useKeyboardControls = ({
             className: "bg-cyber-secondary/10 border-cyber-secondary text-cyber-secondary"
           });
           break;
+        }
         
         case ' ':
           // Spacebar for max intensity
@@ -99,5 +101,5 @@ export const useKeyboardControls = ({
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [dataIntensity, currentScene, onIntensityChange, onSceneChange, toast]);
+  }, [dataIntensity, currentScene, onIntensityChange, onSceneChange, toast, scenes]);
 };

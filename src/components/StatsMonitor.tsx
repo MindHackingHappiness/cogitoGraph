@@ -28,8 +28,11 @@ export const StatsMonitor = () => {
     animate();
 
     return () => {
-      if (statsRef.current && stats.dom) {
-        statsRef.current.removeChild(stats.dom);
+      const stats = statsInstance.current;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const container = statsRef.current;
+      if (container && stats?.dom) {
+        container.removeChild(stats.dom);
       }
       statsInstance.current = null;
     };
