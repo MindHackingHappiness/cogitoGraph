@@ -1,8 +1,7 @@
 import { useFrame } from '@react-three/fiber';
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { Sphere, Line, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { useState, useEffect } from 'react';
 
 interface Node {
   id: string;
@@ -27,7 +26,6 @@ interface DataNodesProps {
 
 export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
   const groupRef = useRef<THREE.Group>(null);
-  const [nodes, setNodes] = useState<Node[]>([]);
   const [time, setTime] = useState(0);
 
   // Generate nodes based on scene type and intensity
@@ -75,10 +73,6 @@ export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
     
     return newNodes;
   }, [intensity, scene]);
-
-  useEffect(() => {
-    setNodes(generateNodes);
-  }, [generateNodes]);
 
   useFrame((state) => {
     setTime(state.clock.elapsedTime);
@@ -153,14 +147,14 @@ export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
 
   return (
     <group ref={groupRef}>
-      {nodes.map((node, index) => (
+      {generateNodes.map((node, index) => (
         <NodeComponent key={node.id} node={node} index={index} />
       ))}
-      
+
       {/* Connection Lines */}
-      {nodes.map((node) =>
+      {generateNodes.map((node) =>
         node.connections.map((connectionId) => {
-          const targetNode = nodes.find(n => n.id === connectionId);
+          const targetNode = generateNodes.find(n => n.id === connectionId);
           if (!targetNode) return null;
           
           return (
