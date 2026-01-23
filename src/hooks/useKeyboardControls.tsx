@@ -16,6 +16,9 @@ export const useKeyboardControls = ({
 }: UseKeyboardControlsProps) => {
   const { toast } = useToast();
 
+  // Define scenes once - DRY principle
+  const scenes = ['cognitive', 'neural', 'quantum'] as const;
+
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       // Prevent default on special keys
@@ -49,7 +52,6 @@ export const useKeyboardControls = ({
           break;
         
         case 'ArrowLeft':
-          const scenes = ['cognitive', 'neural', 'quantum'] as const;
           const currentIndex = scenes.indexOf(currentScene);
           const prevScene = scenes[(currentIndex - 1 + scenes.length) % scenes.length];
           onSceneChange(prevScene);
@@ -61,9 +63,8 @@ export const useKeyboardControls = ({
           break;
         
         case 'ArrowRight':
-          const scenesRight = ['cognitive', 'neural', 'quantum'] as const;
-          const currentIndexRight = scenesRight.indexOf(currentScene);
-          const nextScene = scenesRight[(currentIndexRight + 1) % scenesRight.length];
+          const currentIndexRight = scenes.indexOf(currentScene);
+          const nextScene = scenes[(currentIndexRight + 1) % scenes.length];
           onSceneChange(nextScene);
           toast({
             title: "SCENE SWITCHED",
