@@ -12,7 +12,7 @@ import {
   Maximize,
   Volume2
 } from 'lucide-react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 type SceneType = 'cognitive' | 'neural' | 'quantum';
 
@@ -33,6 +33,24 @@ const HolographicUI = ({
   currentScene,
   onSceneChange
 }: HolographicUIProps) => {
+  const [perfMetrics, setPerfMetrics] = useState({
+    gpu: 75,
+    ram: 45,
+    net: 120
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPerfMetrics(prev => ({
+        gpu: Math.max(30, Math.min(95, prev.gpu + (Math.random() - 0.5) * 10)),
+        ram: Math.max(30, Math.min(80, prev.ram + (Math.random() - 0.5) * 5)),
+        net: Math.max(50, Math.min(200, prev.net + (Math.random() - 0.5) * 20))
+      }));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       {/* Top Control Bar */}
@@ -157,9 +175,9 @@ const HolographicUI = ({
       <div className="absolute bottom-4 right-4 z-40">
         <Card className="spatial-panel neon-border p-3">
           <div className="text-xs font-mono space-y-1">
-            <div className="text-cyber-primary">GPU: {(Math.random() * 30 + 70).toFixed(1)}%</div>
-            <div className="text-cyber-accent">RAM: {(Math.random() * 20 + 40).toFixed(1)}%</div>
-            <div className="text-cyber-secondary">NET: {(Math.random() * 50 + 100).toFixed(0)}ms</div>
+            <div className="text-cyber-primary">GPU: {perfMetrics.gpu.toFixed(1)}%</div>
+            <div className="text-cyber-accent">RAM: {perfMetrics.ram.toFixed(1)}%</div>
+            <div className="text-cyber-secondary">NET: {perfMetrics.net.toFixed(0)}ms</div>
           </div>
         </Card>
       </div>
