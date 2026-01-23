@@ -42,8 +42,9 @@ describe('clusterReposByTopic', () => {
 
     const clusters = clusterReposByTopic(repos);
 
-    expect(clusters.get('TypeScript')).toHaveLength(2);
-    expect(clusters.get('Python')).toHaveLength(1);
+    // Topics override language for clustering
+    expect(clusters.get('frontend')).toHaveLength(2);
+    expect(clusters.get('ml-ai')).toHaveLength(1);
   });
 
   it('should extract topics from repo names as fallback', () => {

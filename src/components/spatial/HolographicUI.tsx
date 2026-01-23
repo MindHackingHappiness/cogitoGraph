@@ -10,11 +10,12 @@ import {
   Eye,
   Settings,
   Maximize,
-  Volume2
+  Volume2,
+  Github
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-type SceneType = 'cognitive' | 'neural' | 'quantum';
+type SceneType = 'cognitive' | 'neural' | 'quantum' | 'github';
 
 interface HolographicUIProps {
   isVRMode: boolean;
@@ -95,7 +96,8 @@ const HolographicUI = ({
             {[
               { id: 'cognitive' as SceneType, icon: Brain, label: 'COGNITIVE SPACE' },
               { id: 'neural' as SceneType, icon: Activity, label: 'NEURAL NETWORK' },
-              { id: 'quantum' as SceneType, icon: Atom, label: 'QUANTUM FIELD' }
+              { id: 'quantum' as SceneType, icon: Atom, label: 'QUANTUM FIELD' },
+              { id: 'github' as SceneType, icon: Github, label: 'GITHUB DATA' }
             ].map(({ id, icon: Icon, label }) => (
               <Button
                 key={id}

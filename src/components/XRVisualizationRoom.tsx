@@ -17,6 +17,8 @@ import { StatsMonitor } from './StatsMonitor';
 import { useKeyboardControls } from '@/hooks/useKeyboardControls';
 import { useWebGLSupport } from '@/hooks/useWebGLSupport';
 import { Card } from '@/components/ui/card';
+import { GitHubDataManager } from './GitHubDataManager';
+import { GitHubRepo } from '@/lib/github/types';
 
 interface XRVisualizationRoomProps {
   className?: string;
@@ -26,7 +28,8 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
   const { isSupported, errorMessage } = useWebGLSupport();
   const [isVRMode, setIsVRMode] = useState(false);
   const [dataIntensity, setDataIntensity] = useState(3);
-  const [currentScene, setCurrentScene] = useState<'cognitive' | 'neural' | 'quantum'>('cognitive');
+  const [currentScene, setCurrentScene] = useState<'cognitive' | 'neural' | 'quantum' | 'github'>('cognitive');
+  const [githubRepos, setGithubRepos] = useState<GitHubRepo[]>([]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -99,34 +102,40 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
         currentScene={currentScene}
         onSceneChange={setCurrentScene}
       />
-      
-      {/* Spatial Controls */}
-      <SpatialControls 
-        dataIntensity={dataIntensity}
-        onIntensityChange={setDataIntensity}
-      />
-      
-      {/* Metrics Overlay */}
-      <MetricsOverlay />
-      
-      {/* 3D Canvas */}
-      <Canvas
-        ref={canvasRef}
-        dpr={[1, 3]}
-        gl={{ 
-          antialias: true, 
-          alpha: false,
-          powerPreference: "high-performance",
-          precision: "highp"
-        }}
-        camera={{ 
-          position: [0, 0, 10], 
-          fov: 75,
-          near: 0.1,
-          far: 1000
-        }}
-        className="absolute inset-0"
-      >
+
+      {/* Spatial Controls - Hide for GitHub scene */}
+      {currentScene !== 'github' && (
+        <SpatialControls
+          dataIntensity={dataIntensity}
+          onIntensityChange={setDataIntensity}
+        />
+      )}
+
+      {/* Metrics Overlay - Hide for GitHub scene */}
+      {currentScene !== 'github' && <MetricsOverlay />}
+
+      {/* GitHub Scene */}
+      {currentScene === 'github' ? (
+        <GitHubDataManager onDataReady={setGithubRepos} />
+      ) : (
+        /* 3D Canvas for other scenes */
+        <Canvas
+          ref={canvasRef}
+          dpr={[1, 3]}
+          gl={{
+            antialias: true,
+            alpha: false,
+            powerPreference: "high-performance",
+            precision: "highp"
+          }}
+          camera={{
+            position: [0, 0, 10],
+            fov: 75,
+            near: 0.1,
+            far: 1000
+          }}
+          className="absolute inset-0"
+        >
         <Suspense fallback={
           <Html center>
             <div className="hologram-text text-2xl animate-pulse">
@@ -187,8 +196,10 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
           />
         </Suspense>
       </Canvas>
-      
-      {/* Matrix Rain Effect */}
+      )}
+
+      {/* Matrix Rain Effect - Only for non-GitHub scenes */}
+      {currentScene !== 'github' && (
       <div className="absolute inset-0 pointer-events-none opacity-20">
         {Array.from({ length: 50 }).map((_, i) => (
           <div
@@ -203,6 +214,7 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
           />
         ))}
       </div>
+      )}
     </div>
   );
 };
