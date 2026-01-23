@@ -7,6 +7,34 @@ interface ParticleFieldProps {
   count: number;
 }
 
+// GPU shader for particle size animation
+const particleVertexShader = `
+  attribute float size;
+  attribute vec3 color;
+  varying vec3 vColor;
+  varying float vSize;
+  uniform float uTime;
+
+  void main() {
+    vColor = color;
+    vSize = size + sin(uTime * 2.0 + position.x * 0.1) * 0.5;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_PointSize = vSize * (300.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+const particleFragmentShader = `
+  varying vec3 vColor;
+  varying float vSize;
+
+  void main() {
+    float r = distance(gl_PointCoord, vec2(0.5));
+    if (r > 0.5) discard;
+    gl_FragColor = vec4(vColor, 1.0 - r * 2.0);
+  }
+`;
+
 const ParticleField = ({ count }: ParticleFieldProps) => {
   const mesh = useRef<THREE.Points>(null);
   
@@ -47,22 +75,25 @@ const ParticleField = ({ count }: ParticleFieldProps) => {
     return { positions, colors, sizes };
   }, [count]);
   
+  const material = useMemo(() => new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 }
+    },
+    vertexShader: particleVertexShader,
+    fragmentShader: particleFragmentShader,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  }), []);
+
   useFrame((state) => {
     if (mesh.current) {
       mesh.current.rotation.y = state.clock.elapsedTime * 0.05;
       mesh.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.2;
-      
-      // Animate particle sizes
-      const sizes = mesh.current.geometry.attributes.size;
-      if (sizes) {
-        for (let i = 0; i < count; i++) {
-          sizes.array[i] = particles.sizes[i] + Math.sin(state.clock.elapsedTime * 2 + i * 0.1) * 0.5;
-        }
-        sizes.needsUpdate = true;
-      }
+      material.uniforms.uTime.value = state.clock.elapsedTime;
     }
   });
-  
+
   return (
     <points ref={mesh}>
       <bufferGeometry>
@@ -85,14 +116,7 @@ const ParticleField = ({ count }: ParticleFieldProps) => {
           itemSize={1}
         />
       </bufferGeometry>
-      <pointsMaterial
-        size={2}
-        sizeAttenuation={true}
-        vertexColors={true}
-        transparent={true}
-        opacity={0.8}
-        blending={THREE.AdditiveBlending}
-      />
+      <primitive object={material} />
     </points>
   );
 };
