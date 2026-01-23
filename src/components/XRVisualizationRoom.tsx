@@ -17,7 +17,10 @@ import { StatsMonitor } from './StatsMonitor';
 import { useKeyboardControls } from '@/hooks/useKeyboardControls';
 import { useWebGLSupport } from '@/hooks/useWebGLSupport';
 import { Card } from '@/components/ui/card';
-import { GitHubDataManager } from './GitHubDataManager';
+import { GitHubControlPanel } from './ui/GitHubControlPanel';
+import { GitHubVisualizer } from './spatial/GitHubVisualizer';
+import { GitHubRepo } from '@/lib/github/types';
+import { useGitHubData } from '@/hooks/useGitHubData';
 
 interface XRVisualizationRoomProps {
   className?: string;
@@ -28,8 +31,29 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
   const [isVRMode, setIsVRMode] = useState(false);
   const [dataIntensity, setDataIntensity] = useState(3);
   const [currentScene, setCurrentScene] = useState<'cognitive' | 'neural' | 'quantum' | 'github'>('cognitive');
+  const [githubRepos, setGithubRepos] = useState<GitHubRepo[]>([]);
+  const [githubLoading, setGithubLoading] = useState(false);
+  const [githubError, setGithubError] = useState<string | null>(null);
+  const [isRealMode, setIsRealMode] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // GitHub data hook
+  const { fetchRepos, cache: githubCache } = useGitHubData();
+
+  const handleGitHubFetch = async (username: string) => {
+    setGithubLoading(true);
+    setGithubError(null);
+
+    try {
+      const data = await fetchRepos(username, isRealMode);
+      setGithubRepos(data);
+    } catch (err) {
+      setGithubError(err instanceof Error ? err.message : 'Failed to fetch repos');
+    } finally {
+      setGithubLoading(false);
+    }
+  };
 
   // Keyboard controls hook
   useKeyboardControls({
@@ -112,28 +136,38 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
       {/* Metrics Overlay - Hide for GitHub scene */}
       {currentScene !== 'github' && <MetricsOverlay />}
 
-      {/* GitHub Scene */}
-      {currentScene === 'github' ? (
-        <GitHubDataManager onDataReady={() => {}} />
-      ) : (
-        /* 3D Canvas for other scenes */
-        <Canvas
-          ref={canvasRef}
-          dpr={[1, 3]}
-          gl={{
-            antialias: true,
-            alpha: false,
-            powerPreference: "high-performance",
-            precision: "highp"
-          }}
-          camera={{
-            position: [0, 0, 10],
-            fov: 75,
-            near: 0.1,
-            far: 1000
-          }}
-          className="absolute inset-0"
-        >
+      {/* GitHub Control Panel - Only show in GitHub mode */}
+      {currentScene === 'github' && (
+        <div className="absolute top-4 left-4 z-40">
+          <GitHubControlPanel
+            onFetch={handleGitHubFetch}
+            loading={githubLoading}
+            error={githubError}
+            isRealMode={isRealMode}
+            onModeToggle={() => setIsRealMode(!isRealMode)}
+            cached={githubCache}
+          />
+        </div>
+      )}
+
+      {/* 3D Canvas - Always rendered, content changes by scene */}
+      <Canvas
+        ref={canvasRef}
+        dpr={[1, 3]}
+        gl={{
+          antialias: true,
+          alpha: false,
+          powerPreference: "high-performance",
+          precision: "highp"
+        }}
+        camera={{
+          position: [0, 0, 10],
+          fov: 75,
+          near: 0.1,
+          far: 1000
+        }}
+        className="absolute inset-0"
+      >
         <Suspense fallback={
           <Html center>
             <div className="hologram-text text-2xl animate-pulse">
@@ -164,24 +198,42 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
             color="#00ffff"
             castShadow
           />
-          
-          {/* Background Particle Field */}
-          <ParticleField count={dataIntensity * 2000} />
-          
-          {/* Cyber Grid Floor */}
-          <CyberGrid />
-          
-          {/* Floating Image Panels */}
-          <FloatingImagePanels 
-            intensity={dataIntensity}
-            scene={currentScene}
-          />
-          
-          {/* Main Data Visualization */}
-          <DataNodes 
-            intensity={dataIntensity} 
-            scene={currentScene}
-          />
+
+          {/* Conditional Scene Rendering */}
+          {currentScene === 'github' ? (
+            /* GitHub Scene */
+            <>
+              {/* Background Particle Field */}
+              <ParticleField count={dataIntensity * 2000} />
+
+              {/* Cyber Grid Floor */}
+              <CyberGrid />
+
+              {/* GitHub Visualizer */}
+              <GitHubVisualizer repos={githubRepos} />
+            </>
+          ) : (
+            /* Other Scenes (cognitive, neural, quantum) */
+            <>
+              {/* Background Particle Field */}
+              <ParticleField count={dataIntensity * 2000} />
+
+              {/* Cyber Grid Floor */}
+              <CyberGrid />
+
+              {/* Floating Image Panels */}
+              <FloatingImagePanels
+                intensity={dataIntensity}
+                scene={currentScene}
+              />
+
+              {/* Main Data Visualization */}
+              <DataNodes
+                intensity={dataIntensity}
+                scene={currentScene}
+              />
+            </>
+          )}
           
           {/* Controls */}
           <OrbitControls
@@ -194,7 +246,6 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
           />
         </Suspense>
       </Canvas>
-      )}
 
       {/* Matrix Rain Effect - Only for non-GitHub scenes */}
       {currentScene !== 'github' && (
