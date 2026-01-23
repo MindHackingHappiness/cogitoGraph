@@ -18,7 +18,6 @@ import { useKeyboardControls } from '@/hooks/useKeyboardControls';
 import { useWebGLSupport } from '@/hooks/useWebGLSupport';
 import { Card } from '@/components/ui/card';
 import { GitHubDataManager } from './GitHubDataManager';
-import { GitHubRepo } from '@/lib/github/types';
 
 interface XRVisualizationRoomProps {
   className?: string;
@@ -29,7 +28,6 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
   const [isVRMode, setIsVRMode] = useState(false);
   const [dataIntensity, setDataIntensity] = useState(3);
   const [currentScene, setCurrentScene] = useState<'cognitive' | 'neural' | 'quantum' | 'github'>('cognitive');
-  const [githubRepos, setGithubRepos] = useState<GitHubRepo[]>([]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -116,7 +114,7 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
 
       {/* GitHub Scene */}
       {currentScene === 'github' ? (
-        <GitHubDataManager onDataReady={setGithubRepos} />
+        <GitHubDataManager onDataReady={() => {}} />
       ) : (
         /* 3D Canvas for other scenes */
         <Canvas

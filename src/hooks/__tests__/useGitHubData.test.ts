@@ -1,5 +1,5 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
 import { useGitHubData } from '../useGitHubData';
 
 describe('useGitHubData', () => {

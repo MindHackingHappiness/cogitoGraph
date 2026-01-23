@@ -59,6 +59,38 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- React Three Fiber
+- Three.js
+- Vitest
+
+## GitHub Data Visualization
+
+Switch to the **GITHUB DATA** scene to visualize any user's repositories in 3D:
+
+1. Click the "GITHUB DATA" button in the holographic UI (top-left panel)
+2. Enter a GitHub username
+3. Toggle between ☁️ **MOCK** (fast, 100 repos) or 🌐 **REAL** (live GitHub API)
+4. Explore the orbital visualization:
+   - **Node size**: Indicates popularity (star count)
+   - **Node color**: Represents programming language
+   - **Hover**: View repository details
+   - **Click**: Open repository on GitHub
+
+### Features
+
+- **Real GitHub API Integration**: Fetch live data from GitHub's REST API
+- **Mock Mode**: Fast development/testing with 100 generated repositories
+- **Topic Clustering**: Groups repos by technology (frontend, backend, ML/AI, devops, testing)
+- **3D Orbital Layout**: Repositories orbit around topic cluster centers
+- **Interactive**: Click to open repos, hover for details
+- **Cyberpunk Aesthetic**: Matches cogitoGraph's visual theme
+
+### Technical Details
+
+- **Data Source**: GitHub REST API (`api.github.com/users/{username}/repos`)
+- **Rate Limiting**: Handles 403 errors with reset time information
+- **Caching**: 5-minute TTL for real API, infinite cache for mock mode
+- **Performance**: Optimized with React.memo and useMemo for 60fps rendering
 
 ## How can I deploy this project?
 

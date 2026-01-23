@@ -1,7 +1,7 @@
 import { memo, useRef, useState, useMemo } from 'react';
 import { Sphere } from '@react-three/drei';
 import { Html } from '@react-three/drei';
-import { Group } from 'three';
+import * as THREE from 'three';
 import { GitHubRepo } from '@/lib/github/types';
 import { calculateNodeSize, getLanguageColorClass } from '@/lib/github/utils';
 import { getLanguageColor } from '@/config/githubLanguages';
@@ -13,7 +13,7 @@ interface GitHubNodeProps {
 
 export const GitHubNode = memo(({ repo, position }: GitHubNodeProps) => {
   const [hovered, setHovered] = useState(false);
-  const meshRef = useRef<Group>(null);
+  const meshRef = useRef<THREE.Object3D>(null);
 
   const size = useMemo(() => calculateNodeSize(repo.stars), [repo.stars]);
   const color = useMemo(() => getLanguageColor(repo.language), [repo.language]);

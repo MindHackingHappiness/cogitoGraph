@@ -1,5 +1,3 @@
-import { GitHubRepo } from './types';
-
 export const calculateNodeSize = (stars: number): number => {
   if (stars < 50) return 0.5;
   if (stars < 500) return 1.0;

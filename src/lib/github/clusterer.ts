@@ -56,7 +56,10 @@ export const clusterReposByTopic = (repos: GitHubRepo[]): Map<string, GitHubRepo
     if (!clusters.has(clusterKey)) {
       clusters.set(clusterKey, []);
     }
-    clusters.get(clusterKey)!.push(repo);
+    const cluster = clusters.get(clusterKey);
+    if (cluster) {
+      cluster.push(repo);
+    }
   });
 
   return clusters;

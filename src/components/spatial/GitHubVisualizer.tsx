@@ -1,5 +1,4 @@
 import { memo, useMemo } from 'react';
-import { Group } from '@react-three/fiber';
 import { GitHubRepo } from '@/lib/github/types';
 import { clusterReposByTopic } from '@/lib/github/clusterer';
 import { GitHubNode } from './GitHubNode';
@@ -54,12 +53,12 @@ export const GitHubVisualizer = memo(({ repos }: GitHubVisualizerProps) => {
   );
 
   return (
-    <Group>
+    <group>
       {/* Render cluster centers */}
-      {Array.from(clusters.entries()).map(([topic, clusterRepos]) => (
-        <Group key={topic} position={nodePositions.centers[topic]}>
+      {Array.from(clusters.entries()).map(([topic, _clusterRepos]) => (
+        <group key={topic} position={nodePositions.centers[topic]}>
           {/* TODO: Add cluster center visualization in later task */}
-        </Group>
+        </group>
       ))}
 
       {/* Render individual repos */}
@@ -70,7 +69,7 @@ export const GitHubVisualizer = memo(({ repos }: GitHubVisualizerProps) => {
           position={nodePositions.nodes[repo.id]}
         />
       ))}
-    </Group>
+    </group>
   );
 });
 
