@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { GitHubRepo } from '@/lib/github/types';
 import { generateMockGitHubData } from '@/lib/github/mockData';
+import { fetchFromGitHubAPI } from '@/lib/github/api';
 
 interface CachedData {
   data: GitHubRepo[];
@@ -32,8 +33,7 @@ export const useGitHubData = () => {
     let data: GitHubRepo[];
 
     if (isRealMode) {
-      // TODO: Implement real GitHub API fetch in later task
-      throw new Error('Real mode not implemented yet');
+      data = await fetchFromGitHubAPI(username);
     } else {
       data = generateMockGitHubData(username);
     }
