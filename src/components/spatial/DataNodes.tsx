@@ -3,6 +3,7 @@ import { useRef, useMemo, useState } from 'react';
 import { Sphere, Line, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import React from 'react';
+import { COLORS, NODE_CONFIG, ANIMATION, INTENSITY, SCENE_TYPES, UI } from '@/constants/config';
 
 interface Node {
   id: string;
@@ -31,7 +32,7 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
 
   // Generate nodes based on scene type and intensity
   const generateNodes = useMemo(() => {
-    const nodeCount = intensity * 20;
+    const nodeCount = intensity * INTENSITY.NODES_PER_UNIT;
     const newNodes: Node[] = [];
     
     for (let i = 0; i < nodeCount; i++) {
@@ -46,9 +47,9 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
           height,
           Math.sin(angle) * radius
         ],
-        size: 0.1 + Math.random() * 0.5,
-        color: scene === 'cognitive' ? '#00ffff' : 
-               scene === 'neural' ? '#ff00ff' : '#ffff00',
+        size: NODE_CONFIG.MIN_SIZE + Math.random() * NODE_CONFIG.SIZE_RANGE,
+        color: scene === SCENE_TYPES.COGNITIVE ? COLORS.COGNITIVE :
+               scene === SCENE_TYPES.NEURAL ? COLORS.NEURAL : COLORS.QUANTUM,
         type: ['api', 'cache', 'neural', 'quantum', 'data'][Math.floor(Math.random() * 5)] as Node['type'],
         connections: [],
         intensity: Math.random(),
@@ -63,7 +64,7 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
     
     // Generate connections
     newNodes.forEach((node, i) => {
-      const connectionCount = Math.floor(Math.random() * 3) + 1;
+      const connectionCount = NODE_CONFIG.CONNECTIONS_PER_NODE;
       for (let j = 0; j < connectionCount; j++) {
         const targetIndex = Math.floor(Math.random() * newNodes.length);
         if (targetIndex !== i) {
@@ -77,10 +78,10 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
 
   useFrame((state) => {
     setTime(state.clock.elapsedTime);
-    
+
     if (groupRef.current) {
-      groupRef.current.rotation.y = time * 0.1;
-      
+      groupRef.current.rotation.y = time * ANIMATION.GROUP_ROTATION_SPEED;
+
       // Animate individual nodes
       groupRef.current.children.forEach((child, i) => {
         if (child.type === 'Mesh') {
@@ -97,7 +98,9 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
 
     useFrame(() => {
       if (meshRef.current) {
-        meshRef.current.scale.setScalar(node.size + Math.sin(time * 2 + index) * 0.2);
+        meshRef.current.scale.setScalar(
+          node.size + Math.sin(time * ANIMATION.NODE_SCALE_SPEED + index) * ANIMATION.NODE_SCALE_AMPLITUDE
+        );
       }
     });
 
@@ -115,7 +118,7 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
 
         {/* Node Label */}
         <Html
-          position={[0, node.size + 0.5, 0]}
+          position={[0, node.size + UI.NODE_LABEL_OFFSET, 0]}
           center
           style={{
             pointerEvents: 'none',
@@ -135,11 +138,15 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
 
         {/* Pulsing ring */}
         <mesh rotation-x={Math.PI / 2}>
-          <ringGeometry args={[node.size * 2, node.size * 2.2, 32]} />
+          <ringGeometry args={[
+            node.size * NODE_CONFIG.RING_SIZE_MULTIPLIER,
+            node.size * (NODE_CONFIG.RING_SIZE_MULTIPLIER + NODE_CONFIG.RING_WIDTH),
+            32
+          ]} />
           <meshBasicMaterial
             color={node.color}
             transparent
-            opacity={0.3 + Math.sin(time * 3 + index) * 0.2}
+            opacity={0.3 + Math.sin(time * ANIMATION.RING_PULSE_SPEED + index) * ANIMATION.RING_PULSE_AMPLITUDE}
           />
         </mesh>
       </group>
@@ -167,7 +174,7 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
             <Line
               key={`${node.id}-${connectionId}`}
               points={[node.position, targetNode.position]}
-              color="#ffffff"
+              color={COLORS.WHITE}
               transparent
               opacity={0.3}
               lineWidth={1}
@@ -181,10 +188,10 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
         <group key={`stream-${i}`}>
           <Line
             points={[
-              [Math.sin(time + i) * 15, Math.cos(time + i) * 5, Math.sin(time * 0.5 + i) * 10],
-              [Math.sin(time + i + 1) * 15, Math.cos(time + i + 1) * 5, Math.sin(time * 0.5 + i + 1) * 10]
+              [Math.sin(time + i) * 15, Math.cos(time + i) * 5, Math.sin(time * ANIMATION.GRID_FLOAT_SPEED + i) * 10],
+              [Math.sin(time + i + 1) * 15, Math.cos(time + i + 1) * 5, Math.sin(time * ANIMATION.GRID_FLOAT_SPEED + i + 1) * 10]
             ]}
-            color="#00ffff"
+            color={COLORS.CYAN}
             transparent
             opacity={0.6}
             lineWidth={2}
