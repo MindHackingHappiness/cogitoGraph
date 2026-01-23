@@ -20,6 +20,7 @@ import { MetricsOverlay } from './spatial/MetricsOverlay';
 import { ParticleField } from './spatial/ParticleField';
 import { CyberGrid } from './spatial/CyberGrid';
 import { FloatingImagePanels } from './spatial/FloatingImagePanels';
+import { StatsMonitor } from './StatsMonitor';
 import { useKeyboardControls } from '@/hooks/useKeyboardControls';
 import { useWebGLSupport } from '@/hooks/useWebGLSupport';
 import { Toaster } from '@/components/ui/toaster';
@@ -94,8 +95,11 @@ export const XRVisualizationRoom = ({ className }: XRVisualizationRoomProps) => 
 
   return (
     <div className={`relative w-full h-screen overflow-hidden cyber-grid ${className}`}>
+      {/* StatsMonitor - FPS Counter */}
+      <StatsMonitor />
+
       {/* Holographic UI Overlay */}
-      <HolographicUI 
+      <HolographicUI
         isVRMode={isVRMode}
         onVRToggle={setIsVRMode}
         dataIntensity={dataIntensity}
