@@ -76,6 +76,31 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
     return newNodes;
   }, [intensity, scene]);
 
+  // Batch connection lines into single geometry for performance
+  const connectionGeometry = useMemo(() => {
+    const linePositions: number[] = [];
+
+    generateNodes.forEach((node) => {
+      node.connections.forEach((connectionId) => {
+        const targetNode = generateNodes.find(n => n.id === connectionId);
+        if (targetNode) {
+          linePositions.push(
+            ...node.position,
+            ...targetNode.position
+          );
+        }
+      });
+    });
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(linePositions, 3)
+    );
+
+    return geometry;
+  }, [generateNodes]);
+
   useFrame((state) => {
     setTime(state.clock.elapsedTime);
 
@@ -164,24 +189,14 @@ const DataNodes = ({ intensity, scene }: DataNodesProps) => {
         <NodeComponent key={node.id} node={node} index={index} />
       ))}
 
-      {/* Connection Lines */}
-      {generateNodes.map((node) =>
-        node.connections.map((connectionId) => {
-          const targetNode = generateNodes.find(n => n.id === connectionId);
-          if (!targetNode) return null;
-          
-          return (
-            <Line
-              key={`${node.id}-${connectionId}`}
-              points={[node.position, targetNode.position]}
-              color={COLORS.WHITE}
-              transparent
-              opacity={0.3}
-              lineWidth={1}
-            />
-          );
-        })
-      )}
+      {/* Connection Lines - Batched for performance */}
+      <lineSegments geometry={connectionGeometry}>
+        <lineBasicMaterial
+          color={COLORS.WHITE}
+          transparent
+          opacity={0.3}
+        />
+      </lineSegments>
       
       {/* Data streams */}
       {Array.from({ length: intensity * 5 }).map((_, i) => (
