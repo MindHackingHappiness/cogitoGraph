@@ -2,6 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useRef, useMemo, useState } from 'react';
 import { Sphere, Line, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import React from 'react';
 
 interface Node {
   id: string;
@@ -24,7 +25,7 @@ interface DataNodesProps {
   scene: 'cognitive' | 'neural' | 'quantum';
 }
 
-export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
+const DataNodes = ({ intensity, scene }: DataNodesProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const [time, setTime] = useState(0);
 
@@ -91,19 +92,19 @@ export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
     }
   });
 
-  const NodeComponent = ({ node, index }: { node: Node; index: number }) => {
+  const NodeComponent = React.memo(({ node, index }: { node: Node; index: number }) => {
     const meshRef = useRef<THREE.Mesh>(null);
-    
+
     useFrame(() => {
       if (meshRef.current) {
         meshRef.current.scale.setScalar(node.size + Math.sin(time * 2 + index) * 0.2);
       }
     });
-    
+
     return (
       <group position={node.position}>
         <Sphere ref={meshRef} args={[node.size, 16, 16]}>
-          <meshPhongMaterial 
+          <meshPhongMaterial
             color={node.color}
             emissive={node.color}
             emissiveIntensity={0.3}
@@ -111,7 +112,7 @@ export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
             opacity={0.8}
           />
         </Sphere>
-        
+
         {/* Node Label */}
         <Html
           position={[0, node.size + 0.5, 0]}
@@ -131,7 +132,7 @@ export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
             )}
           </div>
         </Html>
-        
+
         {/* Pulsing ring */}
         <mesh rotation-x={Math.PI / 2}>
           <ringGeometry args={[node.size * 2, node.size * 2.2, 32]} />
@@ -143,7 +144,12 @@ export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
         </mesh>
       </group>
     );
-  };
+  }, (prevProps, nextProps) => {
+    // Custom comparison: only re-render if node.id or index changes
+    return prevProps.node.id === nextProps.node.id && prevProps.index === nextProps.index;
+  });
+
+  NodeComponent.displayName = 'NodeComponent';
 
   return (
     <group ref={groupRef}>
@@ -188,3 +194,12 @@ export const DataNodes = ({ intensity, scene }: DataNodesProps) => {
     </group>
   );
 };
+
+export const DataNodesMemo = React.memo(DataNodes, (prevProps, nextProps) => {
+  return prevProps.intensity === nextProps.intensity && prevProps.scene === nextProps.scene;
+});
+
+DataNodesMemo.displayName = 'DataNodes';
+
+// Export with memo for backward compatibility
+export { DataNodesMemo as DataNodes };

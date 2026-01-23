@@ -12,6 +12,7 @@ import {
   Maximize,
   Volume2
 } from 'lucide-react';
+import React from 'react';
 
 type SceneType = 'cognitive' | 'neural' | 'quantum';
 
@@ -24,7 +25,7 @@ interface HolographicUIProps {
   onSceneChange: (scene: SceneType) => void;
 }
 
-export const HolographicUI = ({
+const HolographicUI = ({
   isVRMode,
   onVRToggle,
   dataIntensity,
@@ -179,3 +180,17 @@ export const HolographicUI = ({
     </>
   );
 };
+
+export const HolographicUIMemo = React.memo(HolographicUI, (prevProps, nextProps) => {
+  return (
+    prevProps.isVRMode === nextProps.isVRMode &&
+    prevProps.dataIntensity === nextProps.dataIntensity &&
+    prevProps.currentScene === nextProps.currentScene
+  );
+  // Note: intentionally excluding callback functions from comparison
+});
+
+HolographicUIMemo.displayName = 'HolographicUI';
+
+// Export with memo for backward compatibility
+export { HolographicUIMemo as HolographicUI };

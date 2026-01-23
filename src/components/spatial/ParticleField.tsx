@@ -1,12 +1,13 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import React from 'react';
 
 interface ParticleFieldProps {
   count: number;
 }
 
-export const ParticleField = ({ count }: ParticleFieldProps) => {
+const ParticleField = ({ count }: ParticleFieldProps) => {
   const mesh = useRef<THREE.Points>(null);
   
   const particles = useMemo(() => {
@@ -95,3 +96,10 @@ export const ParticleField = ({ count }: ParticleFieldProps) => {
     </points>
   );
 };
+
+export const ParticleFieldMemo = React.memo(ParticleField);
+
+ParticleFieldMemo.displayName = 'ParticleField';
+
+// Export with memo for backward compatibility
+export { ParticleFieldMemo as ParticleField };

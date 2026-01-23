@@ -1,17 +1,18 @@
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Cpu, 
-  HardDrive, 
-  Wifi, 
+import {
+  Cpu,
+  HardDrive,
+  Wifi,
   Zap,
   TrendingUp,
   Database
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import React from 'react';
 
-export const MetricsOverlay = () => {
+const MetricsOverlay = () => {
   const [metrics, setMetrics] = useState({
     apiCalls: 0,
     cacheHits: 0,
@@ -199,3 +200,10 @@ export const MetricsOverlay = () => {
     </>
   );
 };
+
+export const MetricsOverlayMemo = React.memo(MetricsOverlay);
+
+MetricsOverlayMemo.displayName = 'MetricsOverlay';
+
+// Export with memo for backward compatibility
+export { MetricsOverlayMemo as MetricsOverlay };
